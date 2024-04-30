@@ -30,9 +30,6 @@ if not DB_EXISTS:
     """)
     con.commit()
 
-    # cur.execute("CREATE INDEX IF NOT EXISTS idx_name ON judges (name)")
-
-    # con.commit()
     print("Done.")
 else:
     print("Database exists.")
@@ -47,30 +44,22 @@ def search_name(name):
                  "% Granted Other Relief", "% Denied"]
     tmp = cur.fetchall()
     lst = []
-    # for i in range(len(tmp)):
     for row in tmp:
         lst.append(row[:-1])
-    # print(lst)
-    # print(len(lst))
     for row in range(len(lst)):
         count = 0
         res.append([])
-        # print(lst[row])
         while count < 5:
             s: str = tbl[count] + ": " + (lst[row][count])
-            # print(s)
             res[row].append(s)
             count += 1
-    # print(res)
     return res
 
 
 def check_exists_judge(name: str) -> bool:
     """check the judge in the database"""
-    # print("before", name)
     tmp = cur.execute("SELECT name FROM judges WHERE name MATCH ?", (name,))
     res = tmp.fetchone()
-    # print(type(res))
     try:
         if len(res) >= 1:
             return False
@@ -114,29 +103,18 @@ def add_judge() -> list:
 
 def insert_base(name: tuple) -> None:
     """adding judge data to the table"""
-    # print("checking -", name[0])
     global COUNT_ADDED, COUNT_IN_BASE
     if check_exists_judge(name[0]):
         cur.execute("""INSERT INTO judges (name, total_decisions, granted_asylum, granted_other_relief, denied)
                     VALUES (?, ?, ?, ?, ?)""", name)
         con.commit()
         COUNT_ADDED += 1
-    #     print(name[0], "added in table.")
-
     else:
         COUNT_IN_BASE += 1
-        # print(name[0], "already in the database")
     print(COUNT_IN_BASE)
     return
 
 
-# for i in search_name("kevin"):
-#     print(i[:-1])
-
-
-# print(check_exists_judge("6"))
-# add_judge("2", "2", "3", "4", "5")
-# con.close()
 # URL: str = "https://trac.syr.edu/immigration/reports/judgereports/"
 
 # HEADERS: dict = {
@@ -189,11 +167,3 @@ def base():
     #     with open("base_judge.html", "w") as file:
     #         file.write(src)
 
-
-"""
-ЗАМЕТКА
-OK 1 - надо написать функцию, которая добавит судей в таблицу
-OK 2 - написать функцию поиска в таблице
-2.1 - доработать поиск
-3 - написать ф возврата рультата поиска в тг
-"""
